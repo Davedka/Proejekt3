@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projekt Kártyák</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            background-color: #0056b3;
+            background: rgb(174,237,238);
+            background: radial-gradient(circle, rgb(127, 131, 131) 46%, rgb(164, 167, 163) 76%);
+        }
+
+        /* Chatbot ikon */
+        .chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .chatbot:hover {
+            background: #0056b3;
+        }
+
+        /* Chat ablak */
+        #chatWindow {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: rgb(174,238,228);
+            background: radial-gradient(circle, rgb(121, 236, 217) 54%, rgb(207, 195, 195) 80%);
+        }
+
+        /* Chat tartalom, görgethető */
+        #chatBody {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            max-height: calc(100% - 60px);
+            box-sizing: border-box;
+            background: rgb(174,238,228);
+            background: radial-gradient(circle, rgb(86, 90, 89) 1.5%, rgb(128, 126, 126) 80%);
+        }
+
+        /* Chat input és küldés gomb */
+        #chatInputContainer {
+            display: flex;
+            border-top: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+            background: rgb(238,219,174);
+            background: radial-gradient(circle, rgb(129, 129, 129) 46%, rgb(158, 158, 157) 76%);
+        }
+
+        #chatInput {
+            flex-grow: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: rgb(238,219,174);
+            background: radial-gradient(circle, rgba(238,219,174,1) 46%, rgba(214,218,149,1) 76%);
+        }
+
+        #sendBtn {
+            margin-left: 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: black;
+        }
+
+        #sendBtn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Chat üzenetek */
+        #chatBody p {
+            margin: 5px 0;
+        }
+
+        /* Chat user message */
+        .user-message {
+            text-align: right;
+            color: #000;
+            background-color: #e1f5fe;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        /* Chat bot message */
+        .bot-message {
+            text-align: left;
+            color: #000;
+            background-color: #f0f0f0;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        /* Flexbox container */
+        #card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin: 20px;
+        }
+
+        .card {
+            width: 200px;
+            height: 300px;
+            perspective: 1000px;
+            margin: 20px;
+            display: inline-block;
+            background-color: #95999e;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            background-color: #0e0e0e;
+        }
+
+        .card:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px;
+        }
+
+        .card-front {
+            background: #fff;
+            background: rgb(174,238,228);
+            background: radial-gradient(circle, rgba(174,238,228,1) 46%, rgba(247,247,247,1) 76%);
+        }
+
+        .card-back {
+            background: #f0f0f0;
+            transform: rotateY(180deg);
+            text-align: center;
+            background: rgb(174,238,228);
+            background: radial-gradient(circle, rgba(174,238,228,1) 40%, rgba(247,247,247,1) 72%);
+        }
+
+        
+        .card-back img {
+            display: none;
+        }
+
+        .card-front img {
+            margin-top: auto;
+            width: 100%;
+        }
+
+     
+        @media (max-width: 768px) {
+            #card-container {
+                justify-content: center;
+            }
+
+            .card {
+                width: 90%;
+                margin: 10px auto;
+                height: 250px;
+            }
+
+            .card-front img {
+                width: 30%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                width: 100%;
+                height: 220px;
+                margin: 5px;
+            }
+
+            .card-front img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Card Container -->
+<div id="card-container">
+    <!-- First Project Card -->
+    <div class="card" onclick="location.href='your_project_link'">
+        <div class="card-inner">
+            <div class="card-front">
+                <h3>Értékelő táblázat</h3>
+               
+                <img src="faszomgeci.png" alt="Projekt Kép">
+            </div>
+            <div class="card-back">
+                <p>Rövid bemutatás a projektről.</p>
+                <a href="https://sites.google.com/view/bekstlusok-kd9a/f%C5%91oldal" target="_blank">Megnyitás</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Project Card -->
+    <div class="card" onclick="location.href=''">
+        <div class="card-inner">
+            <div class="card-front">
+                <h3>Elégedettségi kérdőív</h3>
+                
+                <img src="vitality.png" alt="Projekt Kép">
+            </div>
+            <div class="card-back">
+                <p>Rövid bemutatás a projektről.</p>
+                <a href="https://sites.google.com/view/bekstlusok-kd9a/f%C5%91oldal" target="_blank">Megnyitás</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Project Card -->
+    <div class="card" onclick="location.href='your_project_link'">
+        <div class="card-inner">
+            <div class="card-front">
+                <h3>Saját weboldal</h3>
+             </p>
+                <img src="geci.png" alt="Projekt Kép">
+            </div>
+            <div class="card-back">
+                <p>Rövid bemutatás a projektről.</p>
+                <a href="https://sites.google.com/view/bekstlusok-kd9a/f%C5%91oldal" target="_blank">Megnyitás</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Button -->
+<div class="chatbot" onclick="toggleChat()">?</div>
+
+<!-- Chat Window -->
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        Chatbot
+    </div>
+    <div class="chat-body" id="chatBody">
+        <p><strong>Bot:</strong> Üdvözöllek! Hogyan segíthetek?</p>
+    </div>
+    <div class="chat-footer">
+        <input type="text" id="chatInput" placeholder="Írj valamit...">
+        <button onclick="sendMessage()">Küldés</button>
+    </div>
+</div>
+
+<script>
+    const projectInfo = {
+        "Értékelő táblázat": "Ez egy értékelő rendszer, amely segít a projektek kiértékelésében. Tartalmazza a szükséges mutatókat, mint a határidők és a teljesítmény.",
+        "Elégedettségi kérdőív": "Ez egy kérdőív, amely az ügyfelek elégedettségét méri. Az eredmények alapján fejlesztéseket lehet végrehajtani a szolgáltatásokban.",
+        "Saját weboldal": "Ez egy személyes portfólió weboldal, ahol bemutatod a projektjeidet, tapasztalataidat és szakértelmedet."
+    };
+
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        chatWindow.style.display = chatWindow.style.display === '' ? 'none' : '';
+    }
+
+    function sendMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const message = chatInput.value;
+        const chatBody = document.getElementById('chatBody');
+        
+        if (message !== '') {
+            chatBody.innerHTML += `<p><strong>Te:</strong> ${message}</p>`;
+            chatInput.value = '';
+            const response = getProjectResponse(message);
+            if (response) {
+                setTimeout(() => {
+                    chatBody.innerHTML += `<p><strong>Bot:</strong> ${response}</p>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    chatBody.innerHTML += `<p><strong>Bot:</strong> Nem értem a kérdést. Kérlek, kérdezz rá egy projektre!</p>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }, 1000);
+            }
+        }
+    }
+
+    function getProjectResponse(message) {
+        const lowerMessage = message.toLowerCase();
+        if (lowerMessage.includes("értékelő táblázat")) return projectInfo["Értékelő táblázat"];
+        else if (lowerMessage.includes("elégedettségi kérdőív")) return projectInfo["Elégedettségi kérdőív"];
+        else if (lowerMessage.includes("saját weboldal")) return projectInfo["Saját weboldal"];
+        return null; 
+    }
+</script>
+
+</body>
+</html>
