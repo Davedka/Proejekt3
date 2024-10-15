@@ -223,6 +223,38 @@
                 height: 40px;
             }
         }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .footer .right-corner,
+        .footer .left-corner {
+            display: flex;
+            padding: 10px;
+        }
+
+        .footer .right-corner a:hover,
+        .footer .left-corner a:hover {
+            text-decoration: underline;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -275,10 +307,21 @@
     </div>
 </div>
 
-<!-- Chatbot Button -->
+<div class="footer">
+   
+    <div class="right-corner">
+        <span>&copy; Dawe 2024</span>
+        <a href="https://github.com/Davedka" target="_blank">GitHub</a>
+        <a href="https://sites.google.com/view/bekstlusok-kd9a/f%C5%91oldal" target="_blank">Google Site</a>
+        <a href="mailto:kiss.david.2007.1014@gmail.com">Email</a>
+    </div>
+</div>
+
+
+
 <div class="chatbot" onclick="toggleChat()">?</div>
 
-<!-- Chat Window -->
+
 <div class="chat-window" id="chatWindow">
     <div class="chat-header">
         Chatbot
@@ -297,6 +340,16 @@
         "Értékelő táblázat": "Ez egy értékelő rendszer, amely segít a projektek kiértékelésében. Tartalmazza a szükséges mutatókat, mint a határidők és a teljesítmény.",
         "Elégedettségi kérdőív": "Ez egy kérdőív, amely az ügyfelek elégedettségét méri. Az eredmények alapján fejlesztéseket lehet végrehajtani a szolgáltatásokban.",
         "Saját weboldal": "Ez egy személyes portfólió weboldal, ahol bemutatod a projektjeidet, tapasztalataidat és szakértelmedet."
+    };
+
+    const generalResponses = {
+        "hello": "Szia! Miben segíthetek?",
+        "hi": "Helló! Miben tudok a segítségedre lenni?",
+        "how are you": "Jól vagyok, köszönöm! Te hogy vagy?",
+        "thanks": "Szívesen! Van még valami, amiben segíthetek?",
+        "thank you": "Nagyon szívesen! Ha van kérdésed, csak szólj.",
+        "bye": "Viszlát! Szép napot!",
+        "goodbye": "Viszlát! Legyen szép napod!"
     };
 
     function toggleChat() {
@@ -327,6 +380,15 @@
         }
     }
 
+    function getBotResponse(message) {
+        // First check for general responses
+        for (let key in generalResponses) {
+            if (message.includes(key)) {
+                return generalResponses[key];
+            }
+        }
+    }    
+
     function getProjectResponse(message) {
         const lowerMessage = message.toLowerCase();
         if (lowerMessage.includes("értékelő táblázat")) return projectInfo["Értékelő táblázat"];
@@ -334,6 +396,15 @@
         else if (lowerMessage.includes("saját weboldal")) return projectInfo["Saját weboldal"];
         return null; 
     }
+
+    // Then check for project-specific responses
+    const projectResponse = getProjectResponse(message);
+    if (projectResponse) {
+        return projectResponse;
+    }
+
+    // Default fallback response
+    return "Nem vagyok biztos benne, hogy értem. Kérlek, próbáld újra!";    
 </script>
 
 </body>
